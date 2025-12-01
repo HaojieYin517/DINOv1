@@ -297,26 +297,26 @@ def train_dino(args):
 
     # ============ optionally resume training ... ============
     to_restore = {"epoch": 0}
-    # utils.restart_from_checkpoint(
-    #     os.path.join(args.output_dir, "checkpoint.pth"),
-    #     run_variables=to_restore,
-    #     student=student,
-    #     teacher=teacher,
-    #     optimizer=optimizer,
-    #     fp16_scaler=fp16_scaler,
-    #     dino_loss=dino_loss,
-    # )
-
-    # partial continue training if needed
     utils.restart_from_checkpoint(
-        "/workspace/dino_output_small_patch8/checkpoint0140.pth",
+        os.path.join(args.output_dir, "checkpoint.pth"),
         run_variables=to_restore,
         student=student,
         teacher=teacher,
-        # optimizer=optimizer,
-        # fp16_scaler=fp16_scaler,
-        # dino_loss=dino_loss,
+        optimizer=optimizer,
+        fp16_scaler=fp16_scaler,
+        dino_loss=dino_loss,
     )
+
+    # partial continue training if needed
+    # utils.restart_from_checkpoint(
+    #     "/workspace/dino_output_small_patch8/checkpoint0140.pth",
+    #     run_variables=to_restore,
+    #     student=student,
+    #     teacher=teacher,
+    #     # optimizer=optimizer,
+    #     # fp16_scaler=fp16_scaler,
+    #     # dino_loss=dino_loss,
+    # )
     start_epoch = to_restore["epoch"]
 
     start_time = time.time()

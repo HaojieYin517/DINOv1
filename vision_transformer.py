@@ -249,6 +249,7 @@ def vit_small(patch_size=16, **kwargs):
 def vit_small_patch8_512(patch_size=8, **kwargs):
     model = VisionTransformer(
         patch_size=patch_size,
+        img_size=[96],
         embed_dim=512,                # MATCH MAE
         depth=12,
         num_heads=8,                  # MATCH MAE
@@ -261,6 +262,7 @@ def vit_small_patch8_512(patch_size=8, **kwargs):
 
 def vit_base_patch8(patch_size=8, **kwargs):
     model = VisionTransformer(
+        img_size=[96],
         patch_size=patch_size,
         embed_dim=704,                # MATCH MAE
         depth=12,
