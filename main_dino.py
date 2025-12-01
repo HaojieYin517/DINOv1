@@ -207,21 +207,6 @@ def train_dino(args):
 
             # Copy into teacher
             teacher.load_state_dict(student.state_dict())
-
-            # full_state = ckpt["model"]
-            # encoder_state = {}
-
-            # # MAE encoder weights come as "encoder.xxx"
-            # for k, v in full_state.items():
-            #     if k.startswith("encoder."):
-            #         encoder_state[k.replace("encoder.", "")] = v
-
-            # # No need to delete pos_embed anymore
-            # msg = student.load_state_dict(encoder_state, strict=True)
-            # print("Student loaded with MAE encoder:", msg)
-
-            # # teacher starts identical
-            # teacher.load_state_dict(student.state_dict())
         else:
             print("No MAE checkpoint found — random initialization.")
         # =======================================================
