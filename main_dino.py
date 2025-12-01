@@ -188,6 +188,7 @@ def train_dino(args):
 
         # ===== LOAD MAE PRETRAINED WEIGHTS (CUSTOM PATCH) =====
         mae_path = "/workspace/mae_patch8_512/checkpoint-299.pth"
+        # mae_path = "/workspace/mae_base_patch8/checkpoint-40.pth"
 
         if os.path.isfile(mae_path):
             print(f"Loading MAE initialization (encoder only) from: {mae_path}")
@@ -278,7 +279,7 @@ def train_dino(args):
     # for mixed precision training
     fp16_scaler = None
     if args.use_fp16:
-        fp16_scaler = torch.cuda.amp.GradScaler()
+        fp16_scaler = torch.amp.GradScaler()
 
     # ============ init schedulers ... ============
     lr_schedule = utils.cosine_scheduler(
@@ -371,7 +372,7 @@ def train_one_epoch(student, teacher, teacher_without_ddp, dino_loss, data_loade
         # move images to gpu
         images = [im.cuda(non_blocking=True) for im in images]
         # teacher and student forward passes + compute dino loss
-        with torch.cuda.amp.autocast(fp16_scaler is not None):
+        with torch.amp.autocast(device_type="cuda", enabled=args.use_fp16): #12345
             teacher_output = teacher(images[:2])  # only the 2 global views pass through the teacher
             student_output = student(images)
             loss = dino_loss(student_output, teacher_output, epoch)
