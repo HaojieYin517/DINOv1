@@ -187,43 +187,26 @@ def train_dino(args):
         embed_dim = student.embed_dim
 
         # ===== LOAD MAE PRETRAINED WEIGHTS (CUSTOM PATCH) =====
-        mae_path = "/workspace/mae_patch8_512/checkpoint-299.pth"
-
+        mae_path = "/workspace/dino_pretrain_init/mae_init_new_epoch299.pth"
         if os.path.isfile(mae_path):
-            print(f"Loading MAE initialization (encoder only) from: {mae_path}")
-            torch.serialization.add_safe_globals([argparse.Namespace])
-            ckpt = torch.load(mae_path, map_location="cpu", weights_only=False)
+            print(f"Loading MAE initialization weights from {mae_path}")
+            ckpt = torch.load(mae_path, map_location="cpu")
 
-            state_dict = ckpt["model"]
+            # some checkpoints wrap weights in a "model" key
+            state_dict = ckpt.get("model", ckpt)
 
-            # Remove only decoder-related keys
-            cleaned = {
-                k: v for k, v in state_dict.items()
-                if not k.startswith("decoder") and not k.startswith("mask_token")
-            }
+            # drop positional embedding because shape doesn't match (37 vs 197 tokens)
+            if "pos_embed" in state_dict:
+                print("Removing 'pos_embed' from MAE state dict due to shape mismatch.")
+                del state_dict["pos_embed"]
 
-            msg = student.load_state_dict(cleaned, strict=False)
-            print("Loaded into student:", msg)
+            msg = student.load_state_dict(state_dict, strict=False)
+            print("Student loaded with MAE weights (except pos_embed):", msg)
 
-            # Copy into teacher
+            # teacher starts from same weights
             teacher.load_state_dict(student.state_dict())
-
-            # full_state = ckpt["model"]
-            # encoder_state = {}
-
-            # # MAE encoder weights come as "encoder.xxx"
-            # for k, v in full_state.items():
-            #     if k.startswith("encoder."):
-            #         encoder_state[k.replace("encoder.", "")] = v
-
-            # # No need to delete pos_embed anymore
-            # msg = student.load_state_dict(encoder_state, strict=True)
-            # print("Student loaded with MAE encoder:", msg)
-
-            # # teacher starts identical
-            # teacher.load_state_dict(student.state_dict())
         else:
-            print("No MAE checkpoint found — random initialization.")
+            print("No MAE initialization found — using random initialization.")
         # =======================================================
 
     # if the network is a XCiT
