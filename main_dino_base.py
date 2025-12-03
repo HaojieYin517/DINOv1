@@ -187,7 +187,7 @@ def train_dino(args):
 
         # ===== LOAD MAE PRETRAINED WEIGHTS (CUSTOM PATCH) =====
         # mae_path = "/workspace/mae_patch8_512/checkpoint-299.pth"
-        mae_path = "/workspace/mae_base_patch8/checkpoint-220.pth"
+        mae_path = "/workspace/mae_base_patch8/checkpoint-400.pth"
 
         if os.path.isfile(mae_path):
             print(f"Loading MAE initialization (encoder only) from: {mae_path}")
